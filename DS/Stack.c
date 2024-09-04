@@ -1,63 +1,105 @@
-#include <stdio.h>
+#include<stdio.h>
+#include<conio.h>
+#include<stdlib.h>
 
-//Global Declaration of TOP
-int TOP = -1;
-int arr[5];
-int len = sizeof(arr) / sizeof(arr[0]);
+typedef struct Stack {
+  int* ptr;
+  size_t capacity;
+  size_t TOP;  
+} Stack;
 
-void PUSH () { int n;
-    if (TOP == len - 1) printf("\nStack Overflow\n");
-    else {
-        printf("ENter the data value : ");
-        scanf("%d",&n);
+Stack* initialiseStack (size_t len) {
+  Stack* st = (Stack*) malloc(sizeof(Stack) );
+  st->capacity = len;
+  st->TOP = -1;
+  st->ptr = (int*) calloc(len, sizeof(int) );
 
-        TOP++;
-        arr[TOP] = n;
-    }
+  return st;
 }
 
-int POP () { int d;
-    if (TOP == -1) {printf("\nStack Underflow\n"); d=NULL;}
-    else {
-        d=arr[TOP];
-        TOP--;
-    }
-    return d;
+void push(Stack* st, int val) {
+  // Increment TOP
+  ++st->TOP;
+  // Check if the Stack is Full
+  if (st->TOP == st->capacity) {
+    // Allocating a bigger Container to the Stack
+    st->ptr = realloc(st->ptr, 2*st->capacity);
+    // Update Stack Capacity
+    st->capacity *= 2;
+  }
+
+  st->ptr[st->TOP] = val;  
 }
 
-void dis() {
-    if (TOP == -1) printf("\nEmpty Stack\n");
-    else { printf("[");
-        for (int i=0;i<=TOP;i++) {
-            printf("%d ",arr[i]);
-        }
-        printf("]");
+int pop(Stack* st) {
+  // Check if Stack Empty
+  if (st->TOP == -1) {
+    printf("\nCannot POP from empty Stack!! \n");
+    return 0;
+  }
+  // Updating TOP
+  st->TOP--;
+  return st->ptr[st->TOP+1];
+}
+
+int peek(Stack* st) {
+  // Check if Stack Empty
+  if (st->TOP == -1) {
+    printf("\n Stack is Empty!");
+    return 0;
+  }
+  return st->ptr[st->TOP];
+}
+
+void printStack(Stack* st) {
+  printf("\n\n Capacity : %d    TOP : %d", st->capacity, st->TOP);
+  printf("\nStack Values : \n");
+  for (int i = 0;i<=st->TOP;++i) {
+    printf("%d ", st->ptr[i]);
+  }
+  printf("\n");
+}
+
+int main (int argc, char* argv[]) {
+  Stack* st = initialiseStack(2);
+  int choice = 1;
+  int val = 0;
+
+  while (choice != 0) {
+    printf("\n\nStack Program....");
+    printf("\n Press...");
+    printf("\n 1 : PUSH()    2 : POP()    3 : PEEK()    4 : printStack()    0 : exit");
+    printf("\nYour Choice : ");
+    scanf("%d", &choice);
+
+    switch (choice) {
+      case 0 : 
+      printf("\nExiting the Program!!");
+      break;
+
+      case 1 : 
+      printf("\nEnter value to Push : ");
+      scanf("%d", &val);
+      push(st, val);
+      break;
+
+      case 2 : 
+      val = pop(st);
+      printf("\nValue Popped : %d", val);
+      break;
+
+      case 3 : 
+      printf("\nTOP Value : %d", peek(st) );
+      break;
+
+      case 4 : 
+      printStack(st);
+      break;
+
+      default : 
+      printf("\nWrong Option...");
     }
-} 
+  }
 
-void main() { int x=1,choice,data;
-    while (x!=0) {
-        retry : 
-        printf("\nPress... \n 1-PUSH \t 2-POP \t 3-Display array \t 0-exit");
-        printf("\nYour option : ");
-        scanf("%d",&choice);
-
-        switch (choice) {
-            case 1 : PUSH();  
-                    break;
-
-            case 2 :  data = POP();
-                    if (data != NULL) printf("The POP data is : %d",data); 
-                    break;
-
-            case 3 : dis();
-                    break;
-
-            case 0 : x=0;
-                    break;
-            
-            default : printf("Invalid Input!!");
-                    goto retry;
-        }
-    }
+  return 0;
 }
