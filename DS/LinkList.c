@@ -1,158 +1,195 @@
- #include<stdio.h>
+#include<stdio.h>
+#include<conio.h>
 #include<stdlib.h>
 
-struct node {
-    int data;
-    struct node *flink, *rlink;
-};
+typedef struct ListNode {
+  int data;
+  struct ListNode* next;
+} ListNode;
 
-struct node *start = NULL,*t,*n;
-int len = 0;
+typedef struct LinkedList {
+  size_t size;
+  ListNode* head;
+  ListNode* tail;
+} LinkedList;
 
-void addNode() { int c;
+LinkedList* initLinkedList () {
+  LinkedList* ll = (LinkedList*) malloc(sizeof(LinkedList));
+  ll->size = 0;
+  ll->head = NULL;
+  ll->tail = NULL;
 
-    n = (struct node*)  malloc( sizeof(struct node) );
-    printf("Enter data for node : ");
-    scanf("%d",&n->data);
-
-    if (len == 0) {
-        start = n;
-        t = n;
-        n->flink =NULL;
-        n->rlink = NULL;
-    }
-    else {
-        retry : 
-        printf("\nWhere do you want to add node");
-        printf("\nPress... \n1-Start \t0-End \t ELSE enter the position in Link List");
-        printf("\nYour Choice : ");
-        scanf("%d",&c);
-
-        switch (c) {
-            case 1 : 
-            n->flink = start;
-            start->rlink = n;
-            start = n;
-            n->rlink = NULL;
-            break;
-
-            case 0 :
-            t=start;
-            while(t->flink != NULL) {
-                t = t->flink;
-            } 
-            n->rlink = t;
-            t->flink = n;
-            n->flink = NULL;
-            break;
-
-            default :
-            if (c <= len) {
-                t = start;
-                for (int i=0;i<c-2;i++) {
-                    t = t->flink;
-                }
-                n->rlink = t;
-                n->flink = t->flink;
-                t->flink = n;
-            }
-            else {
-                printf("\nInvalid Index!!\n");
-                goto retry;
-            }
-        }
-    }
-    printf("\nNODE Created SUCCESSFULLY !!");
-    len++;
-    printf("\t\t%d",len);
+  return ll;
 }
 
-void remNode() { int d;
-    if (len == 0) {
-        printf("\nEmpty Link List!!");
-    }
-    else {
-        del : 
-        printf("\nWhere do you want to remove node from ?");
-        printf("\nPress... \n1-Start \t0-End \t ELSE enter the position in Link List");
-        printf("\nYour Choice : ");
-        scanf("%d",&d);
+void printLL(LinkedList* ll) {
+  printf("\n\nLinked List : \n");
+  if (ll->size == 0) {
+    printf("Empty Linked List...\n");
+    return;
+  }
 
-        switch (d) {
-            case 1 : 
-            start = start->flink;
-            free( start->rlink );
-            start->rlink = NULL;
-            break;
+  ListNode* ptr = ll->head;
+  for (int i = 0;i<ll->size;++i) {
+    printf("%d ", ptr->data);
+    ptr = ptr->next;
+  }
+  printf("\n");
 
-            case 0 : 
-            t=start;
-            while (t->flink->flink != NULL) {t=t->flink;}
-            free( t->flink );
-            t->flink = NULL;
-            break;
-
-            default : 
-            if (d<=len) {
-                t = start;
-                for (int i=0;i<d-2;i++) {
-                    t = t->flink;
-                }
-                t->flink = t->flink->flink;
-                free ( t->flink->rlink );
-                t->flink->rlink = t;
-            }
-            else {
-                printf("\nInvalid Index!!");
-                goto del;
-            }
-        }
-        printf("\nNODE removed SUCCESSFULLY");
-        len--;
-        printf("\t\t%d",len);
-    }
+  return;
 }
 
-void dis() { t=start; 
-    if (len == 0) {
-        printf("\nEmpty Link list!!");
-    }
-    else {
-        for (int i=0;i<len;i++) {
-            printf("\nNODE %d : %d",i+1,t->data);
-            t = t->flink;
-        }
-    }
+void insertListNode(LinkedList* ll, int data, int pos) {
+  if (pos > ll->size) {
+    printf("\nCannot Insert at Pos : %ld for LL of Size : %ld\n", pos, ll->size);
+    return;
+  }
+  if (pos < 0) {
+    return insertListNode(ll, data, ll->size+1 + pos);
+  }
+
+  ListNode* newNode = (ListNode*) malloc(sizeof(ListNode) );
+  newNode->data = data;
+  newNode->next = NULL;
+
+  // Insert At Start
+  if (pos == 0) {
+    newNode->next = ll->head;
+    ll->head = newNode;
+    ll->size++;
+    return;
+  }
+
+  // Insert At End
+  if (pos == ll->size) {
+    ll->tail->next = newNode;
+    ll->tail = newNode;
+    ll->size++;
+    return;
+  }
+
+  // Insert In Middle
+  ListNode* ptr = ll->head;
+  for (int i = 1;i<pos;++i) {
+    ptr = ptr->next;    
+  }
+  // Insert node
+  newNode->next = ptr->next;
+  ptr->next = newNode;  
+  // Update Size
+  ll->size++;
+  return;
 }
 
-void main() { int choice;
-    while (1) {
-        start : 
-        printf("\n\nPress... \n 1-Add Node \t 2-Delete Node \t 3-Display Link List\t 0-exit");
-        printf("\nYour option : ");
-        scanf("%d",&choice);
+ListNode* removeListNode(LinkedList* ll, int pos) {
+  // Check Pos Greater than LL Size
+  if (pos > ll->size-1) {
+    printf("Cannot remove Node at Idx : %d for LinkedList of Size : %d", pos, ll->size);
+    return NULL;
+  }
+  // Check Negative Pos
+  if (pos < 0) {
+    return removeListNode(ll, ll->size + pos);
+  }
 
-        switch (choice) {
-            case 1 : addNode();  
-                    break;
+  // Create Dummy Node
+  ListNode* dummy = (ListNode*)malloc(sizeof(ListNode) );
+  dummy->next = ll->head;
 
-            case 2 : remNode() ; 
-                    break;
+  // Traverse till pos
+  ListNode* ptr = dummy;
+  for (int i = 0;i<pos;++i) {
+    ptr = ptr->next;
+  }
+  // Store removed Node in Temp
+  ListNode* temp = ptr->next;
+  // update Pointers
+  ptr->next = ptr->next->next;
+  temp->next = NULL;
+  ll->head = dummy->next;
+  // update Size
+  ll->size--;
 
-            case 3 : dis();
-                    break;
+  // Cleanup
+  free(dummy);
 
-            case 0 : exit(0);
-                    break;
-            
-            default : printf("Invalid Input!!");
-                    goto start;
-        }
-    }
+  return temp;
 }
 
+ListNode* listNodeAtPos(LinkedList* ll, int pos) {
+  // Check Pos Greater than LL Size
+  if (pos > ll->size-1) {
+    printf("Cannot Get Node at Idx : %d for LinkedList of Size : %d", pos, ll->size);
+    return NULL;
+  }
+  // Check Negative Pos
+  if (pos < 0) {
+    return listNodeAtPos(ll, ll->size+pos);
+  }
 
+  // Traverse till pos
+  ListNode* ptr = ll->head;
+  for (int i = 0;i<pos;++i) {
+    ptr = ptr->next;
+  }
 
+  return ptr;
+}
 
+int main (int argc, char* argv[]) {
+  LinkedList* ll = initLinkedList();
 
+  int choice = -1;
+  int data = 0;
+  int pos = 0;
+  ListNode* node = NULL;
 
+  while (choice) {
+    printf("\n\n Linked List Program...");
+    printf("\nPress...");
+    printf("\n 1 - Insert  2 - Remove  3 - GetNode  4 - DisplayLL  5 - getSize  0 - Exit");
+    printf("\nYour Choice : ");
+    scanf("%d", &choice);
+
+    switch(choice) {
+      case 1: 
+      printf("\n\nInserting Node in LinkedList...");
+      printf("\nEnter data to be Inserted : ");
+      scanf("%d", &data);
+      printf("\nEnter Pos to be Inserted at : ");
+      scanf("%d", &pos);
+      insertListNode(ll, data, pos);
+      break;
+
+      case 2: 
+      printf("\n\nRemoving Node in LinkedList...");
+      printf("\nEnter Pos to be Removed at : ");
+      scanf("%d", &pos);
+      node = removeListNode(ll, pos);
+      if (node) printf("\nNode(%p) Val(%d) removed...", node, node->data);
+      break;
+
+      case 3: 
+      printf("\n\nGetting Node in LinkedList...");
+      printf("\nEnter Pos to Fetch from : ");
+      scanf("%d", &pos);
+      node = listNodeAtPos(ll, pos);
+      if (node) printf("\nNode at Pos(%d) : %d [%p]", pos, node->data, node);
+      break;
+
+      case 4:
+      printLL(ll);
+      break;
+
+      case 5: 
+      printf("\nLinked List Size : %ld", ll->size);
+      break;
+
+      default: 
+      break;
+    }
+
+  }
+
+  return 0;
+}
