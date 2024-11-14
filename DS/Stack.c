@@ -17,6 +17,11 @@ Stack* initialiseStack (size_t len) {
   return st;
 }
 
+void StackCleanup(Stack* st) {
+  free(st->ptr);
+  free(st);
+}
+
 void push(Stack* st, int val) {
   // Increment TOP
   ++st->TOP;
@@ -101,5 +106,7 @@ int main (int argc, char* argv[]) {
     }
   }
 
+  // Cleanup
+  StackCleanup(st);
   return 0;
 }
