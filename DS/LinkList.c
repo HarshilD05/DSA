@@ -136,6 +136,17 @@ ListNode* listNodeAtPos(LinkedList* ll, int pos) {
   return ptr;
 }
 
+void LinkedListCleanup (LinkedList* ll) {
+  ListNode* ptr = ll->head;
+  ListNode* del = NULL;
+  while (ptr) {
+    del = ptr;
+    ptr = ptr->next;
+    free(del);
+  }
+  free(ll);
+}
+
 int main (int argc, char* argv[]) {
   LinkedList* ll = initLinkedList();
 
@@ -190,6 +201,9 @@ int main (int argc, char* argv[]) {
     }
 
   }
+
+  // Cleanup
+  LinkedListCleanup(ll);
 
   return 0;
 }
