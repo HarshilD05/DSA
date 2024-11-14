@@ -91,6 +91,11 @@ Queue* initializeQueue (size_t len) {
   return que;
 }
 
+void QueueCleanup(Queue* q) {
+  free(q->que);
+  free(q);
+}
+
 void printQueue (Queue* q) {
   printf("\n\n Front : %d     Rear : %d", q->front, q->rear);
   printf("\nSize : %d    Capacity : %d", q->size, q->capacity);
@@ -149,6 +154,9 @@ int main(int argc, char *argv[]) {
       break;
     }
   }
+
+  // Cleanup
+  QueueCleanup(q);
   
   return 0;
 }
