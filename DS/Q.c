@@ -2,6 +2,8 @@
 #include <conio.h>
 #include <stdlib.h>
 
+#define MAX_QUEUE_SIZE 1024
+
 typedef struct Queue {
   int* que;
   size_t size;
@@ -20,9 +22,15 @@ void enQueue (Queue* q, int val) {
   // Check if Que Full
   // Can also use front == rear
   else if (q->capacity == q->size) {
+    // Check if MAX_Capacity reached
+    if (q->capacity == MAX_QUEUE_SIZE) {
+      printf("\n Cannot Expand the Queue Any Further.... \n");
+      return;
+    }
+    
     // Reallocating Que to a container with twice the size
     int* temp = q->que;
-    size_t newCapacity = 2*q->capacity;
+    size_t newCapacity = min(2*q->capacity, MAX_QUEUE_SIZE);
     q->que = (int*) calloc(newCapacity, sizeof(int) );
 
     // Copying contents
