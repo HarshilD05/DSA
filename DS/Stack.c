@@ -2,6 +2,8 @@
 #include<conio.h>
 #include<stdlib.h>
 
+#define MAX_STACK_SIZE 1024
+
 typedef struct Stack {
   int* ptr;
   size_t capacity;
@@ -23,16 +25,22 @@ void StackCleanup(Stack* st) {
 }
 
 void push(Stack* st, int val) {
-  // Increment TOP
-  ++st->TOP;
   // Check if the Stack is Full
   if (st->TOP == st->capacity) {
+    // Check if Max Capacity Already Reached
+    if (st->capacity == MAX_STACK_SIZE) {
+      printf("\n Cannot expand Stack any further... \n");
+      return;
+    }
+    
     // Allocating a bigger Container to the Stack
-    st->ptr = realloc(st->ptr, 2*st->capacity);
+    size_t newCapacity = min(2*st->capacity, MAX_STACK_SIZE);
+    st->ptr = realloc(st->ptr, newCapacity);
     // Update Stack Capacity
-    st->capacity *= 2;
+    st->capacity = newCapacity;
   }
-
+  // Increment TOP
+  ++st->TOP;
   st->ptr[st->TOP] = val;  
 }
 
