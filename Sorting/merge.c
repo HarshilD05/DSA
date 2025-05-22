@@ -1,4 +1,3 @@
-
 #include<stdio.h>
 #include<stdlib.h>
 
@@ -55,6 +54,9 @@ void merge (int arr[],int s,int m,int e,int len) {
     for (int i = 0;i<len;i++) {
         printf("%d ",arr[i]);
     }
+
+    // Cleanup
+    free(new);
 
 }
 
