@@ -2,7 +2,7 @@
 
 void PrinArray(int arr[], size_t len) {
     printf("\n[");
-    for (int k=0;k<arrlen;k++) {
+    for (int k=0;k<len;k++) {
             printf("%d, ", arr[k]);
         }
     }
@@ -11,7 +11,7 @@ void PrinArray(int arr[], size_t len) {
 
 void insertionSort(int arr[], size_t len) {
     int parse = 0;
-    for (int i = 0;i<arrlen;i++) {
+    for (int i = 0;i<len;i++) {
         for (int j = i-1;j>=0;j--) {
             // Parse
             parse++;
