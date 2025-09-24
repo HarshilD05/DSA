@@ -82,6 +82,28 @@ int TreeHeight (TreeNode* root) {
   return max(leftSubTreeHeight, rightSubTreeHeight)+1;
 }
 
+TreeNode* LeftRotateTree(TreeNode* root) {
+  if (root == NULL || root ->right == NULL) return NULL;
+
+  // make the Right Child of Root new Root
+  TreeNode* newRoot = root->right;
+  root->right = newRoot->left;
+  newRoot->left = root;
+
+  return newRoot;
+}
+
+TreeNode* RightRotateTree(TreeNode* root) {
+  if (root == NULL || root->left == NULL) return NULL;
+
+  TreeNode* newRoot = root->left;
+  root->left = newRoot->right;
+  newRoot->right = root;
+
+  return newRoot;
+}
+
+
 BalanceReturnData BalanceTree(TreeNode* root) {
   BalanceReturnData ret;
   ret.ptr = root;
@@ -102,14 +124,7 @@ BalanceReturnData BalanceTree(TreeNode* root) {
     if (bFactor > 1) {
       // Check for LL Imbalance By checking the Child Height
       if (lData.leftChildHeight >= lData.rightChildHeight) {
-        // Storing the Current Root
-        TreeNode* temp = root;
-        // Making LeftChild the New ROOT
-        root = root->left;
-        // Make the RightChild of the newRoot as Left of PrevRoot
-        temp->left = root->right;
-        // Make prevRoot as RightChild of newRoot
-        root->right = temp;
+        root = RightRotateTree(root);
 
         // Update the Returning Data
         ret.ptr = root;
@@ -119,13 +134,8 @@ BalanceReturnData BalanceTree(TreeNode* root) {
       }
       // LR Rotation
       else {
-        TreeNode* newRoot = root->left->right;
-        root->left->right = newRoot->left;
-        newRoot->left = root->left;
-
-        root->left = newRoot->right;
-        newRoot->right = root;
-        root = newRoot;
+        root->left = LeftRotateTree(root->left);
+        root = RightRotateTree(root);
 
         // Upadting the Return value
         ret.ptr = root;
@@ -138,10 +148,7 @@ BalanceReturnData BalanceTree(TreeNode* root) {
     else if (bFactor < -1) {
       // RR imbalance
       if (rData.rightChildHeight >= rData.leftChildHeight) {
-        TreeNode* temp = root;
-        root = root->right;
-        temp->right = root->left;
-        root->left = temp;
+        root = LeftRotateTree(root);
 
         // Update Ret
         ret.ptr = root;
@@ -151,12 +158,8 @@ BalanceReturnData BalanceTree(TreeNode* root) {
       }
       // RL Imbalance
       else {
-        TreeNode* newRoot = root->right->left;
-        root->right->left = newRoot->right;
-        newRoot->right = root->right;
-        root->right = newRoot->left;
-        newRoot->left = root;
-        root = newRoot;
+        root->right = RightRotateTree(root->right);
+        root = LeftRotateTree(root);
         
         // Update Ret
         ret.ptr = root;
@@ -288,6 +291,7 @@ void removeVal (BST* tree, int val) {
     // Cleanup and NodeCount Update
     tree->n_Nodes--;
     free(ptr);
+  }
 }
 
 void removeValFromBST (BST* tree, int val) {
@@ -365,3 +369,4 @@ int main (int argc, char* argv[]) {
 
   return 0;
 }
+
