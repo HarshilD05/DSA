@@ -213,91 +213,59 @@ void insertInBST (BST* tree, int val) {
 
 }
 
-void removeVal (BST* tree, int val) {
-  TreeNode* ptr = tree->root;
-  TreeNode* parent = NULL;
-  // Traverse Till Value found in BST
-  while (ptr) {
-    if (ptr->data == val) {
-      break;
-    }
-    else if (val < ptr->data) {
-      parent = ptr;
-      ptr = ptr->left;
-    }
-    else {
-      parent = ptr;
-      ptr = ptr->right;
-    }
-  }
 
-  // Check if Value Found or Not
-  if (ptr == NULL) {
-    printf("\n Value : %d not in BST...\n", val);
+void removeNode(TreeNode* ptr) {
+  // If Value Found
+  // If Leaf Node then Straight up Delete
+  if (ptr->left == NULL && ptr->right == NULL) {
+    free(ptr);
     return;
   }
-  // If Value Found
-  else {
-    // getting the Inorder Successor
-    // Check if Right SubTree Exists
-    if (ptr->right) {
-      TreeNode* inSuccParent = ptr;
-      TreeNode* inSucc = ptr->right;
-      
-      while (inSucc->left) {
-        inSuccParent = inSucc;
-        inSucc = inSucc->left;
-      }
 
-      // check if Inorder Successor is still RightSubtree
-      if (inSucc == ptr->right) {
-        inSucc->left = ptr->left;
-      }
-      else {
-        inSuccParent->left = inSucc->right;
-        inSucc->right = ptr->right;
-        inSucc->left = ptr->left;
-      }
-
-      // Check if Deleted Node is Root
-      if (parent == NULL) {
-        tree->root = inSucc;
-      }
-      else {
-        // Making the InorderSuccessor replace the Node to be deleted
-        if (ptr == parent->left) parent->left = inSucc;
-        else parent->right = inSucc;
-      }
-    }
-    // If No RightSubtree then Inorder Successor is Parent Thus Simply deleteing the Node
-    // and making leftSubTree child of the Parent
-    else {
-      // If Node to be Deleted is the Root then Update root
-      if (parent == NULL) {
-        tree->root = ptr->left;
-      }
-      else {
-        // Check which Child ptr is of Parent
-        if (ptr == parent->left) {
-          parent->left = ptr->left;
-        }
-        else {
-          parent->right = ptr->left;
-        }
-      }
-      
-    }
-
-    // Cleanup and NodeCount Update
-    tree->n_Nodes--;
-    free(ptr);
+  // getting the Inorder Successor
+  TreeNode* inSucc;
+  // Check if Right SubTree Exists
+  if (ptr->right) {
+    inSucc = ptr->right;
+    while (inSucc->left) {
+      inSucc = inSucc->left;
+    }    
   }
+  else {
+    // Take the Inorder Predeccessor
+    inSucc = ptr->left;
+    while (inSucc->right) {
+      inSucc = inSucc->right;
+    }
+  }
+
+  // Swap values with Inorder Successor
+  swap(&inSucc->data, &ptr->data);
+  // Call Delete of Inorder Successor
+  removeNode(inSucc);
 }
 
+
 void removeValFromBST (BST* tree, int val) {
-  removeVal(tree, val);
-  BalanceReturnData d = BalanceTree(tree->root);
-  tree->root = d.ptr;
+  // Find the Value in Tree
+  TreeNode* ptr = tree->root;
+  while (ptr) {
+    if (ptr->data == val) break;
+    else if (ptr->data < val) ptr = ptr->left;
+    else ptr = ptr->right;
+  }
+
+  // Value not found
+  if (ptr == NULL) {
+    printf("\n Value %d not found in Tree ....", val);
+    return;
+  }
+  else {
+    removeNode(ptr);
+    tree->n_Nodes--;
+    BalanceReturnData d = BalanceTree(tree->root);
+    tree->root = d.ptr;
+  } 
 }
 
 int main (int argc, char* argv[]) {
@@ -369,4 +337,5 @@ int main (int argc, char* argv[]) {
 
   return 0;
 }
+
 
